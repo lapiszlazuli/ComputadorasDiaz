@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="es">
+
+    <!-- Basic -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">   
+   
+    <!-- Mobile Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+ 
+     <!-- Site Metas -->
+    <title>ECU Modifier - Modificación de Archivos .bin</title>  
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Site Icons -->
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- ALL VERSION CSS -->
+    <link rel="stylesheet" href="css/versions.css">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" href="css/responsive.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/custom.css">
+
+    <!-- Modernizer for Portfolio -->
+    <script src="js/modernizer.js"></script>
+
+    <!-- Estilos adicionales solo para la funcionalidad de archivos -->
+    <style>
+        .file-upload-area {
+            border: 3px dashed #007bff;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9ff;
+            margin: 30px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .file-upload-area:hover { border-color: #0056b3; background: #e6f3ff; }
+        .file-upload-area.dragover { border-color: #28a745; background: #e8f5e8; }
+        .file-input { display: none; }
+        .file-info { background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .modification-option {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .modification-option:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+        }
+        .modification-option h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .modification-option p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .modification-option i {
+            font-size: 2.5rem;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+        .admin-section {
+            background: #f0f8ff;
+            border: 1px solid #cce5ff;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 40px;
+            text-align: center;
+        }
+        .admin-section h4 {
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+        .admin-toggle {
+            margin-bottom: 20px;
+        }
+        .admin-toggle label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .admin-toggle input[type="checkbox"] {
+            transform: scale(1.5);
+            margin-right: 5px;
+        }
+    </style>
+
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+<body class="host_version"> 
+
+	<!-- Modal -->
+	<div class="modal fade" id="login" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header tit-up">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">Acceso de Cliente</h4>
+			</div>
+			<div class="modal-body customer-box">
+				<!-- Nav tabs -->
+				<ul class="nav nav-tabs">
+					<li><a class="active" href="#Login" data-toggle="tab">Iniciar Sesión</a></li>
+					<li><a href="#Registration" data-toggle="tab">Registro</a></li>
+				</ul>
+				<!-- Tab panes -->
+				<div class="tab-content">
+					<div class="tab-pane active" id="Login">
+						<form role="form" class="form-horizontal" onsubmit="event.preventDefault(); loginUser();">
+							<div class="form-group">
+								<div class="col-sm-12">
+									<input class="form-control" id="loginUsername" placeholder="Usuario" type="text" required>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-12">
+									<input class="form-control" id="loginPassword" placeholder="Contraseña" type="password" required>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-sm-10">
+									<button type="submit" class="btn btn-light btn-radius btn-brd grd1">
+										Iniciar Sesión
+									</button>
+									<a class="for-pwd" href="javascript:;">¿Olvidaste tu contraseña?</a>
+								</div>
+							</div>
+                            <div id="loginMessage" class="text-danger mt-3" style="display: none;"></div>
+						</form>
+					</div>
+					<div class="tab-pane" id="Registration">
+						<form role="form" class="form-horizontal">
+							<div class="form-group">
+								<div class="col-sm-12">
+									<input class="form-control" placeholder="Nombre" type="text">
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-12">
+									<input class="form-control" id="email" placeholder="Correo Electrónico" type="email">
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-12">
+									<input class="form-control" id="mobile" placeholder="Teléfono Móvil" type="email">
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-12">
+									<input class="form-control" id="password" placeholder="Contraseña" type="password">
+								</div>
+							</div>
+							<div class="row">							
+								<div class="col-sm-10">
+									<button type="button" class="btn btn-light btn-radius btn-brd grd1">
+										Guardar &amp; Continuar
+									</button>
+									<button type="button" class="btn btn-light btn-radius btn-brd grd1">
+										Cancelar</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	  </div>
+	</div>
+
+    <!-- LOADER -->
+	<div id="preloader">
+		<div class="loader-container">
+			<div class="progress-br float shadow">
+				<div class="progress__item"></div>
+			</div>
+		</div>
+	</div>
+	<!-- END LOADER -->	
+
+    <!-- Start header -->
+	<header class="top-navbar">
+		<nav class="navbar navbar-expand-lg navbar-light bg-light">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="index.html">
+					<img src="images/logo-hosting.jpeg" alt="Logo" />
+				</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbars-host" aria-controls="navbars-rs-food" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbars-host">
+					<ul class="navbar-nav ml-auto">
+						<li class="nav-item active"><a class="nav-link" href="index.html">Inicio</a></li>
+						<li class="nav-item"><a class="nav-link" href="#about">Acerca de</a></li>
+						<li class="nav-item"><a class="nav-link" href="#features">Características</a></li>
+						<li class="nav-item"><a class="nav-link" href="#contact">Contacto</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+                        <li id="loginStatus"><a class="hover-btn-new log" href="#" data-toggle="modal" data-target="#login"><span>Acceso Cliente</span></a></li>
+                    </ul>
+				</div>
+			</div>
+		</nav>
+	</header>
+	<!-- End header -->
+	
+	<div class="all-title-box">
+		<div class="container text-center">
+			<h1>Modificador de Archivos .bin<span class="m_1">Servicios para modificar archivos .bin de computadoras automotrices.</span></h1>
+		</div>
+	</div>
+	
+    <div id="overviews" class="section lb">
+        <div class="container">
+            <div class="section-title row text-center">
+                <div class="col-md-8 offset-md-2">
+                    <h3>Cargar Archivo .bin</h3>
+                    <p class="lead">Sube tu archivo .bin para comenzar a aplicar modificaciones.</p>
+                </div>
+            </div><!-- end title -->
+
+            <!-- Zona de subida de archivos .bin -->
+            <div class="file-upload-area" id="binFileUploadArea">
+                <i class="fa fa-upload" style="font-size: 3rem; color: #007bff; margin-bottom: 20px;"></i>
+                <div style="font-size: 1.2rem; color: #666; margin-bottom: 10px;">
+                    Arrastra tu archivo .bin aquí o haz clic para seleccionar
+                </div>
+                <div style="color: #999; font-size: 0.9rem;">
+                    Archivos soportados: .bin (máximo 10MB)
+                </div>
+                <input type="file" id="binFileInput" class="file-input" accept=".bin" />
+            </div>
+            
+            <!-- Información del archivo .bin cargado -->
+            <div id="binFileInfo" class="file-info" style="display: none;">
+                <h5 style="color: #1976d2; margin-bottom: 10px;">Información del Archivo .bin</h5>
+                <div class="row">
+                    <div class="col-md-4"><strong>Nombre:</strong> <span id="binFileName"></span></div>
+                    <div class="col-md-4"><strong>Tamaño:</strong> <span id="binFileSize"></span></div>
+                    <div class="col-md-4"><strong>Bytes totales:</strong> <span id="binTotalBytes"></span></div>
+                </div>
+            </div>
+
+            <hr class="invis"> 
+
+            <div class="section-title row text-center" id="modificationOptionsSection" style="display: none;">
+                <div class="col-md-8 offset-md-2">
+                    <h3>Opciones de Modificación</h3>
+                    <p class="lead">Selecciona una opción para aplicar la modificación al archivo .bin cargado.</p>
+                </div>
+            </div>
+
+            <!-- Contenedor para las opciones de modificación (botones/recuadros) -->
+            <div class="row" id="modificationOptionsContainer">
+                <!-- Las opciones se cargarán aquí dinámicamente desde el Excel -->
+            </div>
+
+            <!-- Controles de descarga y limpieza -->
+            <div id="controls" style="display: none; margin-top: 40px; text-align: center;">
+                <button class="btn btn-light btn-radius btn-brd grd1" onclick="downloadModifiedFile()" id="downloadBtn">
+                    <i class="fa fa-download"></i> Descargar Archivo Modificado
+                </button>
+                <button class="btn btn-light btn-radius btn-brd grd1" onclick="clearAllData()" style="margin-left: 10px;">
+                    <i class="fa fa-trash"></i> Limpiar Todo
+                </button>
+            </div>
+
+            <!-- Sección de Administración (solo para Admin) -->
+            <div class="admin-section" id="adminSection" style="display: none;">
+                <h4>Panel de Administración</h4>
+                <p class="lead">Sube el archivo Excel con las reglas de modificación.</p>
+                <div class="file-upload-area" id="excelFileUploadArea">
+                    <i class="fa fa-file-excel" style="font-size: 3rem; color: #28a745; margin-bottom: 20px;"></i>
+                    <div style="font-size: 1.2rem; color: #666; margin-bottom: 10px;">
+                        Arrastra tu archivo Excel aquí o haz clic para seleccionar
+                    </div>
+                    <div style="color: #999; font-size: 0.9rem;">
+                        Archivos soportados: .xlsx, .xls (máximo 5MB)
+                    </div>
+                    <input type="file" id="excelFileInput" class="file-input" accept=".xlsx, .xls" />
+                </div>
+                <div id="excelFileInfo" class="file-info" style="display: none;">
+                    <h5 style="color: #28a745; margin-bottom: 10px;">Información del Archivo Excel</h5>
+                    <div class="row">
+                        <div class="col-md-6"><strong>Nombre:</strong> <span id="excelFileName"></span></div>
+                        <div class="col-md-6"><strong>Tamaño:</strong> <span id="excelFileSize"></span></div>
+                    </div>
+                </div>
+                <p style="margin-top: 20px; font-style: italic; color: #555;">
+                    El archivo Excel debe tener las columnas: "Nombre", "Descripción", "Fila desde", "Fila hasta", "Columna desde", "Columna hasta", "Número de serie", "Cantidad Bit".
+                </p>
+            </div>
+
+        </div><!-- end container -->
+    </div><!-- end section -->
+
+	<div id="pricing" class="section cl">
+		<div class="container">
+			<div class="row text-left stat-wrap">
+				<div class="col-md-4 col-sm-4 col-xs-12">
+					<span data-scroll class="global-radius icon_wrap effect-1 alignleft"><i class="flaticon-hosting"></i></span>
+					<p class="stat_count">12000</p>
+					<h3>Sitios Alojados</h3>
+				</div><!-- end col -->
+
+				<div class="col-md-4 col-sm-4 col-xs-12">
+					<span data-scroll class="global-radius icon_wrap effect-1 alignleft"><i class="flaticon-domain-registration"></i></span>
+					<p class="stat_count">24000</p>
+					<h3>Dominios Vendidos</h3>
+				</div><!-- end col -->
+
+				<div class="col-md-4 col-sm-4 col-xs-12">
+					<span data-scroll class="global-radius icon_wrap effect-1 alignleft"><i class="flaticon-mail"></i></span>
+					<p class="stat_count">5000</p>
+					<h3>Cuentas de Correo</h3>
+				</div><!-- end col -->
+			</div><!-- end row -->
+		</div><!-- end container -->
+	</div><!-- end section -->
+
+    <div id="testimonials" class="parallax section db parallax-off" style="background-image:url('images/parallax_04.jpg');">
+        <div class="container">
+            <div class="section-title text-center">
+                <h3>Testimonios</h3>
+                <p>Lorem ipsum dolor sit aet, consectetur adipisicing lit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+            </div><!-- end title -->
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="testi-carousel owl-carousel owl-theme">
+                        <div class="testimonial clearfix">
+                            <div class="desc">
+                                <h3><i class="fa fa-quote-left"></i> ¡Soporte Maravilloso!</h3>
+                                <p class="lead">Entregaron mi proyecto a tiempo con la competencia, con un equipo altamente calificado, experimentado y profesional.</p>
+                            </div>
+                            <div class="testi-meta">
+                                <img src="images/testi_01.png" alt="" class="img-fluid">
+                                <h4>James Fernando </h4>
+                            </div>
+                            <!-- end testi-meta -->
+                        </div>
+                        <!-- end testimonial -->
+
+                        <div class="testimonial clearfix">
+                            <div class="desc">
+                                <h3><i class="fa fa-quote-left"></i> ¡Servicios Impresionantes!</h3>
+                                <p class="lead">Te explicaré cómo nació toda esta idea equivocada de denunciar el placer y alabar el dolor, y te daré una explicación completa.</p>
+                            </div>
+                            <div class="testi-meta">
+                                <img src="images/testi_02.png" alt="" class="img-fluid">
+                                <h4>Jacques Philips </h4>
+                            </div>
+                            <!-- end testi-meta -->
+                        </div>
+                        <!-- end testimonial -->
+
+                        <div class="testimonial clearfix">
+                            <div class="desc">
+                                <h3><i class="fa fa-quote-left"></i> ¡Gran Equipo y Talentoso!</h3>
+                                <p class="lead">El maestro constructor de la felicidad humana, nadie rechaza, le disgusta o evita el placer en sí mismo, porque es muy perseguir el placer.</p>
+                            </div>
+                            <div class="testi-meta">
+                                <img src="images/testi_03.png" alt="" class="img-fluid ">
+                                <h4>Venanda Mercy </h4>
+                            </div>
+                            <!-- end testi-meta -->
+                        </div>
+                        <!-- end testimonial -->
+                        <div class="testimonial clearfix">
+                            <div class="desc">
+                                <h3><i class="fa fa-quote-left"></i> ¡Soporte Maravilloso!</h3>
+                                <p class="lead">Entregaron mi proyecto a tiempo con la competencia, con un equipo altamente calificado, experimentado y profesional.</p>
+                            </div>
+                            <div class="testi-meta">
+                                <img src="images/testi_01.png" alt="" class="img-fluid">
+                                <h4>James Fernando </h4>
+                            </div>
+                            <!-- end testi-meta -->
+                        </div>
+                        <!-- end testimonial -->
+
+                        <div class="testimonial clearfix">
+                            <div class="desc">
+                                <h3><i class="fa fa-quote-left"></i> ¡Servicios Impresionantes!</h3>
+                                <p class="lead">Te explicaré cómo nació toda esta idea equivocada de denunciar el placer y alabar el dolor, y te daré una explicación completa.</p>
+                            </div>
+                            <div class="testi-meta">
+                                <img src="images/testi_02.png" alt="" class="img-fluid">
+                                <h4>Jacques Philips </h4>
+                            </div>
+                            <!-- end testi-meta -->
+                        </div>
+                        <!-- end testimonial -->
+
+                        <div class="testimonial clearfix">
+                            <div class="desc">
+                                <h3><i class="fa fa-quote-left"></i> ¡Gran Equipo y Talentoso!</h3>
+                                <p class="lead">El maestro constructor de la felicidad humana, nadie rechaza, le disgusta o evita el placer en sí mismo, porque es muy perseguir el placer.</p>
+                            </div>
+                            <div class="testi-meta">
+                                <img src="images/testi_03.png" alt="" class="img-fluid">
+                                <h4>Venanda Mercy </h4>
+                            </div>
+                            <!-- end testi-meta -->
+                        </div><!-- end testimonial -->
+                    </div><!-- end carousel -->
+                </div><!-- end col -->
+            </div><!-- end row -->
+        </div><!-- end container -->
+    </div><!-- end section -->
+
+    <div class="parallax section dbcolor">
+        <div class="container">
+            <div class="row logos">
+                <div class="col-md-2 col-sm-2 col-xs-6 wow fadeInUp">
+                    <a href="#"><img src="images/logo_01.png" alt="" class="img-repsonsive"></a>
+                </div>
+                <div class="col-md-2 col-sm-2 col-xs-6 wow fadeInUp">
+                    <a href="#"><img src="images/logo_02.png" alt="" class="img-repsonsive"></a>
+                </div>
+                <div class="col-md-2 col-sm-2 col-xs-6 wow fadeInUp">
+                    <a href="#"><img src="images/logo_03.png" alt="" class="img-repsonsive"></a>
+                </div>
+                <div class="col-md-2 col-sm-2 col-xs-6 wow fadeInUp">
+                    <a href="#"><img src="images/logo_04.png" alt="" class="img-repsonsive"></a>
+                </div>
+                <div class="col-md-2 col-sm-2 col-xs-6 wow fadeInUp">
+                    <a href="#"><img src="images/logo_05.png" alt="" class="img-repsonsive"></a>
+                </div>
+                <div class="col-md-2 col-sm-2 col-xs-6 wow fadeInUp">
+                    <a href="#"><img src="images/logo_06.png" alt="" class="img-repsonsive"></a>
+                </div>
+            </div><!-- end row -->
+        </div><!-- end container -->
+    </div><!-- end section -->
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-xs-12">
+                    <div class="widget clearfix">
+                        <div class="widget-title">
+                            <h3>Acerca de Nosotros</h3>
+                        </div>
+                        <p> Integer rutrum ligula eu dignissim laoreet. Pellentesque venenatis nibh sed tellus faucibus bibendum. Sed fermentum est vitae rhoncus molestie. Cum sociis natoque penatibus et magnis dis montes.</p>
+                        <p>Sed fermentum est vitae rhoncus molestie. Cum sociis natoque penatibus et magnis dis montes.</p>
+                    </div><!-- end clearfix -->
+                </div><!-- end col -->
+
+				<div class="col-lg-4 col-md-4 col-xs-12">
+                    <div class="widget clearfix">
+                        <div class="widget-title">
+                            <h3>Enlaces de Información</h3>
+                        </div>
+                        <ul class="footer-links">
+                            <li><a href="#">Inicio</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Precios</a></li>
+							<li><a href="#">Acerca de</a></li>
+							<li><a href="#">Preguntas Frecuentes</a></li>
+							<li><a href="#">Contacto</a></li>
+                        </ul><!-- end links -->
+                    </div><!-- end clearfix -->
+                </div><!-- end col -->
+				
+                <div class="col-lg-4 col-md-4 col-xs-12">
+                    <div class="widget clearfix">
+                        <div class="widget-title">
+                            <h3>Detalles de Contacto</h3>
+                        </div>
+
+                        <ul class="footer-links">
+                            <li><a href="mailto:#">info@yoursite.com</a></li>
+                            <li><a href="#">www.yoursite.com</a></li>
+                            <li>PO Box 16122 Collins Street West Victoria 8007 Australia</li>
+                            <li>+61 3 8376 6284</li>
+                        </ul><!-- end links -->
+                    </div><!-- end clearfix -->
+                </div><!-- end col -->
+				
+            </div><!-- end row -->
+        </div><!-- end container -->
+    </footer><!-- end footer -->
+
+    <div class="copyrights">
+        <div class="container">
+            <div class="footer-distributed">
+                <div class="footer-left">                   
+                    <p class="footer-company-name">Todos los Derechos Reservados. &copy; 2018 <a href="#">QuickCloud</a> Diseño por : <a href="https://html.design/">html design</a></p>
+                </div>
+
+                <div class="footer-right">
+                    <ul class="footer-links-soi">
+						<li><a href="#"><i class="fa fa-facebook"></i></a></li>
+						<li><a href="#"><i class="fa fa-github"></i></a></li>
+						<li><a href="#"><i class="fa fa-twitter"></i></a></li>
+						<li><a href="#"><i class="fa fa-dribbble"></i></a></li>
+						<li><a href="#"><i class="fa fa-pinterest"></i></a></li>
+					</ul><!-- end links -->
+                </div>
+            </div>
+        </div><!-- end container -->
+    </div><!-- end copyrights -->
+
+    <a href="#" id="scroll-to-top" class="dmtop global-radius"><i class="fa fa-angle-up"></i></a>
+
+    <!-- jQuery y Bootstrap JS desde CDN (para asegurar compatibilidad) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- SheetJS (xlsx) para leer archivos Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        // Variables globales
+        let currentBinFile = null;
+        let originalBinData = null; // Datos originales del archivo .bin
+        let modifiedBinData = null; // Datos modificados del archivo .bin
+        let modificationRules = []; // Reglas cargadas desde el archivo Excel
+        let currentUserRole = 'guest'; // 'guest', 'user', 'admin'
+        let currentUsername = '';
+
+        // Elementos del DOM (declarados aquí, inicializados en DOMContentLoaded)
+        let loginModal; 
+        const loginUsernameInput = document.getElementById('loginUsername');
+        const loginPasswordInput = document.getElementById('loginPassword');
+        const loginMessageDiv = document.getElementById('loginMessage');
+        const loginStatusElement = document.getElementById('loginStatus');
+
+        const binFileUploadArea = document.getElementById('binFileUploadArea');
+        const binFileInput = document.getElementById('binFileInput');
+        const binFileInfo = document.getElementById('binFileInfo');
+        const modificationOptionsSection = document.getElementById('modificationOptionsSection');
+        const modificationOptionsContainer = document.getElementById('modificationOptionsContainer');
+        const controls = document.getElementById('controls');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const adminSection = document.getElementById('adminSection');
+        const excelFileUploadArea = document.getElementById('excelFileUploadArea');
+        const excelFileInput = document.getElementById('excelFileInput');
+        const excelFileInfo = document.getElementById('excelFileInfo');
+
+        // --- Funciones de Autenticación y Roles ---
+
+        function checkLoginStatus() {
+            currentUserRole = localStorage.getItem('userRole') || 'guest';
+            currentUsername = localStorage.getItem('username') || '';
+
+            if (currentUserRole === 'guest') {
+                loginStatusElement.innerHTML = '<a class="hover-btn-new log" href="#" data-toggle="modal" data-target="#login"><span>Acceso Cliente</span></a>';
+                adminSection.style.display = 'none';
+            } else {
+                loginStatusElement.innerHTML = `<a class="hover-btn-new log" href="#" onclick="logoutUser()"><span>Bienvenido, ${currentUsername} (${currentUserRole}) - Salir</span></a>`;
+                if (currentUserRole === 'admin') {
+                    adminSection.style.display = 'block';
+                } else {
+                    adminSection.style.display = 'none';
+                }
+            }
+            renderModificationOptions(); // Re-renderizar opciones según el rol
+        }
+
+        function loginUser() {
+            const username = loginUsernameInput.value;
+            const password = loginPasswordInput.value;
+
+            loginMessageDiv.style.display = 'none'; // Ocultar mensajes anteriores
+
+            try {
+                if (username === 'admin' && password === 'adminpass') {
+                    localStorage.setItem('userRole', 'admin');
+                    localStorage.setItem('username', 'Administrador');
+                    loginMessageDiv.textContent = 'Inicio de sesión exitoso como Administrador.';
+                    loginMessageDiv.className = 'text-success mt-3'; // Green text for success
+                    loginMessageDiv.style.display = 'block';
+                    setTimeout(() => { // Dar tiempo para leer el mensaje antes de cerrar
+                        loginModal.hide();
+                        checkLoginStatus();
+                        loadModificationRules();
+                    }, 500); 
+                } else if (username === 'user' && password === 'userpass') {
+                    localStorage.setItem('userRole', 'user');
+                    localStorage.setItem('username', 'Usuario');
+                    loginMessageDiv.textContent = 'Inicio de sesión exitoso como Usuario.';
+                    loginMessageDiv.className = 'text-success mt-3';
+                    loginMessageDiv.style.display = 'block';
+                    setTimeout(() => {
+                        loginModal.hide();
+                        checkLoginStatus();
+                        loadModificationRules();
+                    }, 500);
+                } else {
+                    loginMessageDiv.textContent = 'Usuario o contraseña incorrectos.';
+                    loginMessageDiv.className = 'text-danger mt-3'; // Red text for error
+                    loginMessageDiv.style.display = 'block';
+                    // No ocultar el modal en caso de fallo para que el usuario pueda reintentar
+                }
+            } catch (error) {
+                console.error("Error durante el proceso de inicio de sesión:", error);
+                loginMessageDiv.textContent = 'Ocurrió un error inesperado. Inténtalo de nuevo.';
+                loginMessageDiv.className = 'text-danger mt-3';
+                loginMessageDiv.style.display = 'block';
+            }
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('username');
+            clearAllData(); // Limpiar también los datos del BIN y las reglas al cerrar sesión
+            checkLoginStatus();
+            alert('Sesión cerrada.');
+        }
+
+        // --- Funciones de Persistencia de Reglas (Excel) ---
+
+        function loadModificationRules() {
+            const savedRules = localStorage.getItem('modificationRules');
+            if (savedRules) {
+                try {
+                    modificationRules = JSON.parse(savedRules);
+                    renderModificationOptions();
+                    console.log('Reglas de modificación cargadas desde localStorage.');
+                } catch (e) {
+                    console.error('Error al parsear reglas de localStorage:', e);
+                    modificationRules = [];
+                }
+            } else {
+                modificationRules = [];
+                renderModificationOptions();
+            }
+        }
+
+        function saveModificationRules() {
+            localStorage.setItem('modificationRules', JSON.stringify(modificationRules));
+            console.log('Reglas de modificación guardadas en localStorage.');
+        }
+
+        // --- Funciones de Carga y Procesamiento de Archivos ---
+
+        // Procesar archivo BIN
+        function processBinFile(file) {
+            if (!file.name.toLowerCase().endsWith('.bin')) {
+                alert('Por favor selecciona un archivo .bin válido.');
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                alert('El archivo .bin es demasiado grande. Máximo 10MB permitido.');
+                return;
+            }
+
+            currentBinFile = file;
+            showBinFileInfo(file);
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                originalBinData = new Uint8Array(e.target.result);
+                modifiedBinData = new Uint8Array(originalBinData); // Copia para modificar
+                controls.style.display = 'block';
+                modificationOptionsSection.style.display = 'block';
+                downloadBtn.style.display = 'none'; // Ocultar hasta que se aplique una modificación
+                alert('Archivo .bin cargado correctamente. Selecciona una opción de modificación.');
+            };
+            reader.onerror = function() {
+                alert('Error al leer el archivo .bin.');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Mostrar información del archivo BIN
+        function showBinFileInfo(file) {
+            document.getElementById('binFileName').textContent = file.name;
+            document.getElementById('binFileSize').textContent = formatFileSize(file.size);
+            document.getElementById('binTotalBytes').textContent = file.size.toLocaleString() + ' bytes';
+            binFileInfo.style.display = 'block';
+        }
+
+        // Procesar archivo EXCEL (solo Admin)
+        function processExcelFile(file) {
+            if (currentUserRole !== 'admin') {
+                alert('Necesitas ser administrador para cargar archivos Excel.');
+                return;
+            }
+            if (!file.name.toLowerCase().endsWith('.xlsx') && !file.name.toLowerCase().endsWith('.xls')) {
+                alert('Por favor selecciona un archivo Excel válido (.xlsx o .xls).');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('El archivo Excel es demasiado grande. Máximo 5MB permitido.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                
+                const json = XLSX.utils.sheet_to_json(worksheet);
+                
+                modificationRules = json.map(row => ({
+                    name: row['Nombre'] || 'Opción sin nombre',
+                    description: row['Descripción'] || 'Sin descripción.',
+                    rowFrom: parseInt(row['Fila desde']),
+                    rowTo: parseInt(row['Fila hasta']),
+                    colFrom: parseInt(row['Columna desde']),
+                    colTo: parseInt(row['Columna hasta']),
+                    serialNumber: String(row['Número de serie']),
+                    bitCount: parseInt(row['Cantidad Bit'])
+                })).filter(rule => 
+                    !isNaN(rule.rowFrom) && !isNaN(rule.rowTo) && 
+                    !isNaN(rule.colFrom) && !isNaN(rule.colTo) && 
+                    rule.serialNumber && !isNaN(rule.bitCount)
+                );
+
+                if (modificationRules.length === 0) {
+                    alert('No se encontraron reglas de modificación válidas en el archivo Excel. Asegúrate de que las columnas "Nombre", "Descripción", "Fila desde", "Fila hasta", "Columna desde", "Columna hasta", "Número de serie", "Cantidad Bit" existan y contengan datos válidos.');
+                } else {
+                    alert(`Se cargaron ${modificationRules.length} reglas de modificación desde el Excel.`);
+                    saveModificationRules(); // Guardar las reglas cargadas
+                }
+                
+                renderModificationOptions();
+                showExcelFileInfo(file);
+            };
+            reader.onerror = function() {
+                alert('Error al leer el archivo Excel.');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Mostrar información del archivo EXCEL
+        function showExcelFileInfo(file) {
+            document.getElementById('excelFileName').textContent = file.name;
+            document.getElementById('excelFileSize').textContent = formatFileSize(file.size);
+            excelFileInfo.style.display = 'block';
+        }
+
+        // Renderizar las opciones de modificación como recuadros
+        function renderModificationOptions() {
+            modificationOptionsContainer.innerHTML = '';
+            if (modificationRules.length === 0) {
+                modificationOptionsContainer.innerHTML = '<div class="col-md-12 text-center"><p>No hay opciones de modificación disponibles. El administrador debe cargar un archivo Excel.</p></div>';
+                modificationOptionsSection.style.display = 'block'; // Mostrar la sección aunque esté vacía
+                return;
+            }
+
+            modificationRules.forEach((rule, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'col-md-4 col-sm-6 col-xs-12';
+                optionDiv.innerHTML = `
+                    <div class="icon-wrapper wow fadeIn modification-option" data-wow-duration="1s" data-wow-delay="${0.2 + index * 0.1}s" onclick="applyModification(${index})">
+                        <i class="fa fa-cogs global-radius effect-1 alignleft"></i>
+                        <h3>${rule.name}</h3>
+                        <p>${rule.description}</p>
+                        <small class="readmore">
+                            <a>Clic para aplicar</a>
+                        </small>
+                    </div>
+                `;
+                modificationOptionsContainer.appendChild(optionDiv);
+            });
+            modificationOptionsSection.style.display = 'block';
+        }
+
+        // Aplicar una modificación específica
+        function applyModification(ruleIndex) {
+            if (!modifiedBinData) {
+                alert('Por favor, primero carga un archivo .bin.');
+                return;
+            }
+
+            const rule = modificationRules[ruleIndex];
+            if (!rule) {
+                alert('Regla de modificación no encontrada.');
+                return;
+            }
+
+            const rowFrom = rule.rowFrom;
+            const rowTo = rule.rowTo;
+            const colFrom = rule.colFrom;
+            const colTo = rule.colTo;
+            const serialNumber = rule.serialNumber;
+            const bitCount = rule.bitCount;
+
+            // Validaciones básicas de la regla
+            if (isNaN(rowFrom) || isNaN(rowTo) || isNaN(colFrom) || isNaN(colTo) || !serialNumber || isNaN(bitCount)) {
+                alert(`Error en la regla "${rule.name}": Datos incompletos o inválidos.`);
+                return;
+            }
+            if (rowFrom > rowTo || colFrom > colTo) {
+                alert(`Error en la regla "${rule.name}": Rango de filas o columnas inválido.`);
+                return;
+            }
+            if (rowTo * 16 + colTo >= modifiedBinData.length) {
+                alert(`Error en la regla "${rule.name}": El rango de modificación excede el tamaño del archivo .bin.`);
+                return;
+            }
+
+            const serialBytes = convertSerialToBytes(serialNumber, bitCount);
+            
+            let byteIndex = 0;
+            for (let row = rowFrom; row <= rowTo; row++) {
+                for (let col = 0; col < 16; col++) {
+                    // Calcular la posición absoluta del byte en el archivo
+                    const filePosition = row * 16 + col;
+
+                    // Verificar si la posición está dentro del rango de modificación definido por la regla
+                    const isWithinRuleRange = (row > rowFrom || (row === rowFrom && col >= colFrom)) &&
+                                              (row < rowTo || (row === rowTo && col <= colTo));
+
+                    if (isWithinRuleRange && filePosition < modifiedBinData.length && byteIndex < serialBytes.length) {
+                        modifiedBinData[filePosition] = serialBytes[byteIndex];
+                        byteIndex++;
+                    } else if (byteIndex >= serialBytes.length) {
+                        // Si ya se insertaron todos los bytes del serial, salir del bucle
+                        break; 
+                    }
+                }
+                if (byteIndex >= serialBytes.length) break; // Salir del bucle de filas si ya se insertaron todos los bytes
+            }
+            
+            alert(`Modificación "${rule.name}" aplicada correctamente.`);
+            downloadBtn.style.display = 'inline-block'; // Mostrar botón de descarga
+        }
+
+        // Convertir número de serie a bytes
+        function convertSerialToBytes(serialNumber, bitCount) {
+            const bytes = [];
+            const cleanSerial = String(serialNumber).replace(/[^0-9A-Fa-f]/g, ''); // Asegurar que sea string
+
+            // Determinar si es hexadecimal o texto
+            const isHex = /^[0-9A-Fa-f]+$/.test(cleanSerial) && (cleanSerial.length % 2 === 0);
+
+            if (isHex) {
+                for (let i = 0; i < cleanSerial.length; i += 2) {
+                    const hexByte = cleanSerial.substr(i, 2);
+                    bytes.push(parseInt(hexByte, 16));
+                }
+            } else {
+                // Si no es hex válido, tratar como texto ASCII
+                for (let i = 0; i < serialNumber.length; i++) {
+                    bytes.push(serialNumber.charCodeAt(i));
+                }
+            }
+            
+            // Asegurar que el número de bytes coincida con bitCount si es necesario
+            const expectedBytes = Math.ceil(bitCount / 8);
+            while (bytes.length < expectedBytes) {
+                bytes.unshift(0); // Rellenar con ceros al inicio si es necesario (ej. para 16 bits, 0x12 -> 0x0012)
+            }
+            return bytes.slice(0, expectedBytes); // Truncar si es más largo de lo esperado
+        }
+
+        // Descargar archivo modificado
+        function downloadModifiedFile() {
+            if (!modifiedBinData || !currentBinFile) {
+                alert('No hay archivo modificado para descargar.');
+                return;
+            }
+            
+            const blob = new Blob([modifiedBinData], { type: 'application/octet-stream' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = currentBinFile.name.replace('.bin', '_modificado.bin');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Limpiar todos los datos y resetear la interfaz
+        function clearAllData() {
+            currentBinFile = null;
+            originalBinData = null;
+            modifiedBinData = null;
+            binFileInput.value = '';
+            document.getElementById('binFileName').textContent = '';
+            document.getElementById('binFileSize').textContent = '';
+            document.getElementById('binTotalBytes').textContent = '';
+            binFileInfo.style.display = 'none';
+            modificationOptionsSection.style.display = 'none';
+            controls.style.display = 'none';
+            downloadBtn.style.display = 'none';
+            
+            // Si es admin, no borramos las reglas del Excel de localStorage, solo si se desloguea
+            if (currentUserRole !== 'admin') {
+                modificationRules = [];
+                renderModificationOptions();
+            }
+            alert('Todos los datos del archivo BIN han sido limpiados.');
+        }
+
+        // Formatear tamaño de archivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Inicializar la interfaz al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ocultar el preloader una vez que el DOM esté listo
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                preloader.style.display = 'none'; 
+            }
+
+            // Inicializar el modal de Bootstrap aquí, después de que el DOM esté listo
+            loginModal = new bootstrap.Modal(document.getElementById('login'));
+
+            checkLoginStatus(); // Verifica si hay una sesión activa y ajusta la UI
+            loadModificationRules(); // Carga las reglas guardadas (si las hay)
+
+            // --- Event Listeners para la carga de archivos BIN ---
+            binFileUploadArea.addEventListener('click', () => {
+                binFileInput.click();
+            });
+
+            binFileInput.addEventListener('change', (event) => {
+                if (event.target.files.length > 0) {
+                    processBinFile(event.target.files[0]);
+                }
+            });
+
+            binFileUploadArea.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                binFileUploadArea.classList.add('dragover');
+            });
+
+            binFileUploadArea.addEventListener('dragleave', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                binFileUploadArea.classList.remove('dragover');
+            });
+
+            binFileUploadArea.addEventListener('drop', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                binFileUploadArea.classList.remove('dragover');
+                if (event.dataTransfer.files.length > 0) {
+                    processBinFile(event.dataTransfer.files[0]);
+                }
+            });
+
+            // --- Event Listeners para la carga de archivos EXCEL (Admin) ---
+            excelFileUploadArea.addEventListener('click', () => {
+                excelFileInput.click();
+            });
+
+            excelFileInput.addEventListener('change', (event) => {
+                if (event.target.files.length > 0) {
+                    processExcelFile(event.target.files[0]);
+                }
+            });
+
+            excelFileUploadArea.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                excelFileUploadArea.classList.add('dragover');
+            });
+
+            excelFileUploadArea.addEventListener('dragleave', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                excelFileUploadArea.classList.remove('dragover');
+            });
+
+            excelFileUploadArea.addEventListener('drop', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                excelFileUploadArea.classList.remove('dragover');
+                if (event.dataTransfer.files.length > 0) {
+                    processExcelFile(event.dataTransfer.files[0]);
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
